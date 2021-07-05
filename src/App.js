@@ -1,24 +1,23 @@
 import logo from './logo.svg';
 import './App.css';
+import Produtos from './components/Produtos';
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
+    <div className="container-md shadow p-0">     
+      <div className="jumbotron bg-light p-4">
+        <h1 className="display-6">IFPR - Tópicos Especiais em Desenvolvimento Web</h1>
+        <p className="lead">
+          Implementar um Sistema Web Completo utilizando um dos frameworks
+          e/ou bibliotecas especiais ensinadas nas aulas: Angular, ReactJS ou Django.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+        <hr className="my-4"/>
+          <p>Aluno: Ericsson Beck F. Souza</p>   
+          
+      </div>        
+        <Produtos />          
+    </div>   
   );
 }
 
