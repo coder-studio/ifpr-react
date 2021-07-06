@@ -13,14 +13,17 @@ class Produtos extends React.Component{
         editNome: "",
         editDescricao: "",
         editValor:0,
-        editar: null
+        editar: null,
+        text: ""
     };    
     
     async componentDidMount() {
-        this.getProdutos();              
+        this.getProdutos();       
+        this.setState({text: this.state.text.concat('componentDidMount\r\n')});       
     }
 
     async getProdutos(){
+        this.setState({text: this.state.text.concat('Buscando Produtos...\r\n')});
         const options = {
             method: 'GET',
             headers: {'Content-Type': 'application/json'}
@@ -28,9 +31,11 @@ class Produtos extends React.Component{
         const response = await fetch(this.url, options);                
         const json = await response.json();
         this.setState({ produtos: json }); 
+        this.setState({text: this.state.text.concat('Produtos Ok\r\n')});
     }
 
     async insertProduto(){
+        this.setState({text: this.state.text.concat('Criando novo produto no banco de dados\r\n')});
         var novoProduto = {pro_name: this.state.novoNome, pro_descricao:this.state.novoDescricao, pro_valor: this.state.novoValor};
         const options = {
             method: 'POST',
@@ -40,10 +45,13 @@ class Produtos extends React.Component{
         const response = await fetch(this.url, options);    
         const json = await response.json();    
         this.getProdutos();     
+        this.setState({text: this.state.text.concat('Novo produto criado\r\n')});
     }    
 
     async editProduto(id){
+        this.setState({text: this.state.text.concat('Editando produto no banco de dados\r\n')});
         var editProduto = {pro_id: id, pro_name: this.state.editNome, pro_descricao: this.state.editDescricao, pro_valor: this.state.editValor};
+        
         const options = {
             method: 'PUT',
             body: JSON.stringify(editProduto),
@@ -53,10 +61,12 @@ class Produtos extends React.Component{
         const response = await fetch(this.url, options);    
         const json = await response.json(); 
         this.cancelarEdit();
-        this.getProdutos();         
+        this.getProdutos();        
+        this.setState({text: this.state.text.concat('Produto atualizado\r\n')}); 
     }
 
-    async deleteProduto(id){        
+    async deleteProduto(id){       
+        this.setState({text: this.state.text.concat('Excluindo produto no banco de dados\r\n')}); 
         var deleteProduto = {pro_id: id};
         const options = {
             method: 'DELETE',
@@ -66,6 +76,7 @@ class Produtos extends React.Component{
         const response = await fetch(this.url, options);    
         const json = await response.json(); 
         this.getProdutos(); 
+        this.setState({text: this.state.text.concat('Produto excluido\r\n')}); 
     }
 
     novoSubmit = (e) => {
@@ -73,11 +84,12 @@ class Produtos extends React.Component{
         this.insertProduto();
     }
 
-    editSubmit = (id) => {           
+    editSubmit = (id) => {        
         this.editProduto(id);
     }
 
     editarChange(id){        
+        this.setState({text: this.state.text.concat('Modo de edição ativado\r\n')}); 
         var produtosArray = this.state.produtos;        
         produtosArray.filter(item => item.pro_id == id).map(produto => 
             {                
@@ -89,7 +101,13 @@ class Produtos extends React.Component{
         this.setState({ editar: id });
     }
 
+    apagarLog = (e) => {
+        this.setState({ text: "" });
+         
+    }
+
     cancelarEdit = (e) => {        
+        this.setState({text: this.state.text.concat('Modo de edição cancelado\r\n')});
         this.setState({ editar: null });
     }
 
@@ -114,40 +132,57 @@ class Produtos extends React.Component{
     valorChange = (e) => {
         this.setState({ novoValor: e.target.value });
     }
+    textChange = (e) => {
+        this.setState({ text: e.target.value });
+    }
 
      render(){         
         return(        
         <div className="my-3 p-2">       
-            <form onSubmit={this.novoSubmit}>
-                <div className="form-group col-md-4">
-                    <label for="pro_name">Produto</label>
-                    <input type="text" className="form-control" name="pro_name" value={this.state.novoNome} onChange={this.nameChange}/>
-                </div>             
-                <div className="form-group col-md-4">
-                    <label for="pro_descricao">Descrição</label>
-                    <input type="text" className="form-control" name="pro_descricao" value={this.state.novoDescricao} onChange={this.descricaoChange}/>
+            <div className='row'>
+                <div className="col-6">
+                <h4>Novo Produto</h4>
+                <form onSubmit={this.novoSubmit}>
+                    <div className="form-group">
+                        <label for="pro_name">Produto</label>
+                        <input type="text" className="form-control" name="pro_name" value={this.state.novoNome} onChange={this.nameChange}/>
+                    </div>             
+                    <div className="form-group">
+                        <label for="pro_descricao">Descrição</label>
+                        <input type="text" className="form-control" name="pro_descricao" value={this.state.novoDescricao} onChange={this.descricaoChange}/>
+                    </div>
+                    <div className="form-group">
+                        <label for="pro_valor">Valor</label>
+                        <input type="text" className="form-control" name="pro_valor" value={this.state.novoValor} onChange={this.valorChange}/>
+                    </div>
+                    <button type="submit" className="btn btn-primary my-3">Novo</button> 
+                </form>
                 </div>
-                <div className="form-group col-md-4">
-                    <label for="pro_valor">Valor</label>
-                    <input type="text" className="form-control" name="pro_valor" value={this.state.novoValor} onChange={this.valorChange}/>
+                <div className='col-6'>
+                    <h4>Log</h4>
+                    <div class="form-group">                        
+                        <textarea value={this.state.text} class="form-control" rows="7" onChange={this.textChange}></textarea>
+                    </div>
+                    <button type="button" className="btn btn-primary my-3" onClick={this.apagarLog}>Apagar log</button>
                 </div>
-                <button type="submit" className="btn btn-primary my-3">Novo</button> 
-            </form>
-                
-            <table className='table table-sm my-5'>
-                <thead className='thead-dark'>
-                    <tr>
-                        <th scope='col'>Produto</th>
-                        <th scope='col'>Descrição</th>
-                        <th scope='col'>Valor</th>
-                        <th scope='col'>Ação</th>
-                    </tr>
-                </thead>
-                <tbody>            
+            </div>
+            <div className='row'>
+                <div className='col-12'>    
+                <h4>Lista de Produtos</h4>
+                    <table className='table table-sm my-5'>
+                        <thead className='thead-dark'>
+                            <tr>
+                                <th scope='col'>Produto</th>
+                                <th scope='col'>Descrição</th>
+                                <th scope='col'>Valor</th>
+                                <th scope='col'>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>            
 
-                {this.state.produtos.map((produto) => {
+                        {this.state.produtos.map((produto) => {
                     
-                    return this.state.editar === produto.pro_id ? 
+                        return this.state.editar === produto.pro_id ? 
                         (
                             <tr key={produto.id} className="animate__animated animate__fadeIn">
                                 <td className="col-3"><input type="text" className="field" value={this.state.editNome} onChange={this.changeEditName}/></td>
@@ -178,9 +213,11 @@ class Produtos extends React.Component{
                                 </td>
                             </tr>                                                           
                         );                        
-                    })}
-                </tbody>
-            </table> 
+                        })}
+                    </tbody>
+                </table> 
+                </div>
+            </div>
         </div>
         );
     }
